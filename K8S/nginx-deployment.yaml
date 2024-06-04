@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      initContainers:
+      - name: init-mysql
+        image: alpine:latest
+        command: ['sh', '-c', 'until nc -zv mysql-service 3306; do echo "Waiting for MySQL to be ready..."; sleep 5; done;']
+      containers:
+      - name: web
+        image: sergicasti/practicak8ssergi:latest
+        ports:
+        - containerPort: 5000
